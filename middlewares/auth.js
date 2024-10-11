@@ -7,9 +7,7 @@ const auth = (req, res, next) => {
 
   if (!authorization) {
     return next(new UnauthorizedError("Authorization header is missing"));
-    // return res
-    //   .status(errorMessages.AUTHENTICATION_ERROR)
-    //   .send({ message: errorMessages.AuthenticationError });
+
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -21,9 +19,6 @@ const auth = (req, res, next) => {
   } catch (err) {
     console.error(err);
     return next(new UnauthorizedError("Invalid or expired token"));
-    // return res
-    //   .status(errorMessages.AUTHENTICATION_ERROR)
-    //   .send({ message: errorMessages.AuthenticationError });
   }
 
   return null;

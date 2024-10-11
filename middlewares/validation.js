@@ -8,20 +8,11 @@ const validateURL = (value, helpers) => {
   return helpers.message("Invalid URL format");
 };
 
-// Validation for creating an item
-const validateCreateItem = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    imageUrl: Joi.string().custom(validateURL).required(),
-    weather: Joi.string().valid("hot", "warm", "cold").required(),
-  }),
-});
-
 // Validation for creating a user
 const validateCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    avatar: Joi.string().custom(validateURL).required(),
+    // avatar: Joi.string().custom(validateURL).required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),
@@ -48,7 +39,6 @@ const validateUpdateUser = celebrate({
 });
 
 module.exports = {
-  validateCreateItem,
   validateCreateUser,
   validateLogin,
   validateId,

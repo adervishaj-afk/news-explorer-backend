@@ -1,6 +1,4 @@
 const Article = require("../models/article");
-// const NotFoundError = require("../errors/not-found-error");
-// const ForbiddenError = require("../errors/forbidden-error");
 
 // Get all saved articles for the user
 const getArticles = (req, res) => {
