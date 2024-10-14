@@ -5,9 +5,8 @@ const NotFoundError = require("../utils/errors/NotFoundError");
 const BadRequestError = require("../utils/errors/BadRequestError");
 const ConflictError = require("../utils/errors/ConflictError");
 const UnauthorizedError = require("../utils/errors/UnauthorizedError");
-
+const { JWT_SECRET } = require("../utils/config");
 // Environment variable for secret key (should be in .env)
-const { NODE_ENV, JWT_SECRET } = process.env;
 
 // Create a new user (signup)
 const createUser = (req, res, next) => {
@@ -56,7 +55,7 @@ const login = (req, res, next) => {
 
         const token = jwt.sign(
           { _id: user._id },
-          NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+          JWT_SECRET,
           { expiresIn: "7d" } // Token valid for 7 days
         );
 

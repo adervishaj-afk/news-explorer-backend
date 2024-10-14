@@ -7,13 +7,12 @@ const auth = (req, res, next) => {
 
   if (!authorization) {
     return next(new UnauthorizedError("Authorization header is missing"));
-
   }
 
   const token = authorization.replace("Bearer ", "");
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, NODE_ENV === "production" ? JWT_SECRET : "dev-secret",);
     req.user = payload; // Add the payload to the request object
     next(); // Pass the request to the next middleware or route handler
   } catch (err) {
