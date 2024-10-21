@@ -12,7 +12,7 @@ router.get("/saved", auth, getArticles);
 
 // Delete (Unsave) a bookmarked article
 router.delete(
-  "/article/:articleId/unlike",
+  "/:articleId/unlike",
   auth,
   //  validateId,
   deleteArticle

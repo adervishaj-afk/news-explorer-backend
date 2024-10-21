@@ -47,15 +47,16 @@ const likeArticle = (req, res) => {
 };
 
 const deleteArticle = (req, res) => {
-  const articleId = req.params.articleId; // This is now the string articleId
-  const userId = req.user._id; // Ensure this comes from your auth middleware
+  const articleId = req.params.articleId;
+  const userId = req.user._id;
 
-  console.log("Received articleId from params:", articleId); // Log the article ID
-  console.log("Received userId from token:", userId); // Log the user ID
+  console.log("Received articleId from params:", articleId);
+  console.log("Received userId from token:", userId);
 
   // Find the article by the custom articleId (not _id)
-  Article.findOne({ articleId }) // Use findOne to search by articleId string
+  Article.findOne({_id: articleId })
     .then((article) => {
+      console.log(article)
       if (!article) {
         console.log("Article not found for articleId:", articleId);
         return res.status(404).send({ message: "Article not found" });
@@ -64,12 +65,12 @@ const deleteArticle = (req, res) => {
       // If found, remove the user from the bookmarkedBy array
       return Article.findByIdAndUpdate(
         article._id,
-        { $pull: { bookmarkedBy: userId } }, // Remove user from bookmarkedBy array
-        { new: true } // Return the updated article
+        { $pull: { bookmarkedBy: userId } },
+        { new: true }
       );
     })
     .then((updatedArticle) => {
-      if (!updatedArticle) return; // Ensure it doesn't proceed if not updated
+      if (!updatedArticle) return;
 
       // If no users have bookmarked the article, delete it
       if (updatedArticle.bookmarkedBy.length === 0) {

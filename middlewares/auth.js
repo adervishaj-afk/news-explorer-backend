@@ -11,14 +11,14 @@ const auth = (req, res, next) => {
   }
 
   const token = authorization.replace("Bearer ", "");
-  console.log("Token received:", token); // Log the received token
+  console.log("Token received:", token); 
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET); // Decode the token
-    console.log("Decoded token payload:", payload); // Log the payload to check its contents
+    const payload = jwt.verify(token, JWT_SECRET);
+    console.log("Decoded token payload:", payload);
 
-    req.user = payload; // Attach payload to request object
-    console.log("User ID from token:", req.user._id); // Move the log here to ensure it's logged after assignment
+    req.user = payload;
+    console.log("User ID from token:", req.user._id);
 
     next(); // Pass the request to the next middleware or route handler
   } catch (err) {
