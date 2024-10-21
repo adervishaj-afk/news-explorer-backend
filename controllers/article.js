@@ -1,45 +1,25 @@
 const Article = require("../models/article");
 
-// Get all saved articles for the user
+// Get all saved articles for the user (articles the user has liked/bookmarked)
 const getArticles = (req, res) => {
-  const owner = req.user._id;
+  const userId = req.user._id; // Get the user's ID from the request (auth middleware)
 
-  Article.find({ owner })
-    .then((articles) => res.send(articles))
-    .catch(() => res.status(500).send({ message: "Error fetching articles" }));
-};
-
-// Delete a saved article
-const deleteArticle = (req, res) => {
-  const { articleId } = req.params;
-  const owner = req.user._id;
-
-  Article.findById(articleId)
-    .then((article) => {
-      if (!article) {
-        return res.status(404).send({ message: "Article not found" });
+  // Find all articles where the user's ID exists in the bookmarkedBy array
+  Article.find({ bookmarkedBy: userId })
+    .then((articles) => {
+      if (!articles || articles.length === 0) {
+        return res.status(404).send({ message: "No saved articles found" });
       }
-      if (article.owner.toString() !== owner) {
-        return res
-          .status(403)
-          .send({
-            message: "You don't have permission to delete this article",
-          });
-      }
-
-      return Article.findByIdAndRemove(articleId);
+      res.send(articles); // Send the articles to the client
     })
-    .then(() => res.send({ message: "Article deleted successfully" }))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        res.status(400).send({ message: "Invalid article ID" });
-      } else {
-        res.status(500).send({ message: "Error deleting article" });
-      }
-    });
+    .catch(() => res.status(500).send({ message: "Error fetching saved articles" }));
 };
 
 module.exports = {
   getArticles,
-  deleteArticle,
+};
+
+
+module.exports = {
+  getArticles,
 };

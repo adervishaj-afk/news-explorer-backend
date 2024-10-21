@@ -1,16 +1,28 @@
-const router = require('express').Router();
+const router = require("express").Router();
 const auth = require("../middlewares/auth");
-const { validateSaveArticle, validateId } = require("../middlewares/validation");
+const { validateId } = require("../middlewares/validation");
+const { likeArticle, deleteArticle } = require("../controllers/likeArticle");
 
 const {
   getArticles, // Get all bookmarked articles
-  deleteArticle, // Unsave (delete) a bookmarked article
 } = require("../controllers/article");
 
 // Get all bookmarked articles for the authenticated user
-router.get("/", auth, getArticles);
+router.get("/saved", auth, getArticles);
 
 // Delete (Unsave) a bookmarked article
-router.delete("/:articleId", auth, validateId, deleteArticle);
+router.delete(
+  "/article/:articleId/unlike",
+  auth,
+  //  validateId,
+  deleteArticle
+);
+//  Saved a bookmarked article
+router.put(
+  "/:articleId/like",
+  auth,
+  // validateId,
+  likeArticle
+);
 
 module.exports = router;

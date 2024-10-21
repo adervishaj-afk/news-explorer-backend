@@ -1,7 +1,7 @@
-const {NODE_ENV} = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
-const { JWT_SECRET = NODE_ENV === "production" ? JWT_SECRET : "dev-secret"} = process.env;
-
-module.exports = {
-  JWT_SECRET,
+const config = {
+  JWT_SECRET: NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
 };
+
+module.exports = config;

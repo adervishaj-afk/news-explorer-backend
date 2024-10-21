@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const articleSchema = new mongoose.Schema({
+  articleId: {
+    type: String, // Store the unique combination of title, publishedAt, and sourceName
+    required: true,
+    unique: true, // Make sure it's unique
+  },
   title: {
     type: String,
     required: true,

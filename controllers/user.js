@@ -6,7 +6,6 @@ const BadRequestError = require("../utils/errors/BadRequestError");
 const ConflictError = require("../utils/errors/ConflictError");
 const UnauthorizedError = require("../utils/errors/UnauthorizedError");
 const { JWT_SECRET } = require("../utils/config");
-// Environment variable for secret key (should be in .env)
 
 // Create a new user (signup)
 const createUser = (req, res, next) => {
