@@ -1,4 +1,4 @@
-const Article = require("../models/article");
+const Article = require("../models/article.js");
 
 // Get all saved articles for the user (articles the user has liked/bookmarked)
 const getArticles = (req, res) => {
@@ -12,13 +12,10 @@ const getArticles = (req, res) => {
       }
       res.send(articles); // Send the articles to the client
     })
-    .catch(() => res.status(500).send({ message: "Error fetching saved articles" }));
+    .catch(() =>
+      res.status(500).send({ message: "Error fetching saved articles" })
+    );
 };
-
-module.exports = {
-  getArticles,
-};
-
 
 module.exports = {
   getArticles,
