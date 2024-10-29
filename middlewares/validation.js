@@ -27,7 +27,7 @@ const validateLogin = celebrate({
 
 const validateId = celebrate({
   params: Joi.object().keys({
-    articleId: Joi.string().hex().length(24).required(),
+    articleId: Joi.string().required(),
   }),
 });
 

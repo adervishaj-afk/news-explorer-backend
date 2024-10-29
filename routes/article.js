@@ -14,18 +14,8 @@ router.get("/saved", auth, getArticles);
 // POST .../articles
 
 // Delete (Unsave) a bookmarked article
-router.delete(
-  "/:articleId/delete",
-  auth,
-  //  validateId,
-  deleteArticle
-);
+router.delete("/:articleId/delete", auth, validateId, deleteArticle);
 //  Saved a bookmarked article
-router.post(
-  "/:articleId/like",
-  auth,
-  // validateId,
-  likeArticle
-);
+router.post("/:articleId/like", auth, validateId, likeArticle);
 
 module.exports = router;

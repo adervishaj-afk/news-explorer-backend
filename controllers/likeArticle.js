@@ -32,9 +32,12 @@ const likeArticle = (req, res) => {
       } else {
         // If article exists, check if user has already bookmarked it
         if (article.bookmarkedBy.includes(userId)) {
-          return res
-            .status(409)
-            .send({ message: "Article already bookmarked by user." });
+          // return res
+          //   .status(409)
+          //   .send({ message: "Article already bookmarked by user." });
+          const newError = new Error()
+          newError.statusCode = 409;
+          throw (newError)
         }
         // If not bookmarked yet, add user to bookmarkedBy
         return Article.findByIdAndUpdate(
@@ -48,6 +51,10 @@ const likeArticle = (req, res) => {
       res.status(200).send(article); // Send back the created/updated article
     })
     .catch((err) => {
+      if (err.statusCode) {
+        res.status(err.statusCode).send({message: "Testing 409 error for duplicate"})
+        return;
+      }
       console.error("Error in likeArticle:", err);
       res.status(500).send({ message: "Error liking article" });
     });

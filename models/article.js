@@ -22,6 +22,10 @@ const articleSchema = new mongoose.Schema({
       message: "Invalid URL format for the image.",
     },
   },
+  url: {
+    type: String,
+    required: true,
+  },
   publishedAt: {
     type: Date,
     required: true,
