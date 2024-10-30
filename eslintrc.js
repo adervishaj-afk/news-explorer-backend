@@ -1,10 +1,10 @@
-console.error("erfsd");
-
 module.exports = {
   env: {
     es2021: true,
     node: true,
   },
+
+  // Add the necessary extensions.
   extends: ["eslint:recommended", "airbnb-base", "prettier"],
   overrides: [
     {

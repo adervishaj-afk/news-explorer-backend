@@ -30,6 +30,8 @@ const createUser = (req, res, next) => {
         next(new ConflictError("User with this email already exists"));
       } else if (err.name === "ValidationError") {
         next(new BadRequestError("Invalid user data"));
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
       } else {
         next(err);
       }
@@ -62,7 +64,13 @@ const login = (req, res, next) => {
         res.send({ token });
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Get the current user's information
@@ -74,7 +82,13 @@ const getCurrentUser = (req, res, next) => {
       }
       res.status(200).send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Update user profile (name or avatar)
@@ -95,6 +109,8 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(new BadRequestError("Invalid data for updating profile"));
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
       } else {
         next(err);
       }

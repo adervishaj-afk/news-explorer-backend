@@ -1,4 +1,5 @@
 const Article = require("../models/article.js");
+const BadRequestError = require("../utils/errors/BadRequestError"); // Assuming you have a BadRequestError class
 
 // Get all saved articles for the user (articles the user has liked/bookmarked)
 const getArticles = (req, res) => {
@@ -12,9 +13,14 @@ const getArticles = (req, res) => {
       }
       res.send(articles); // Send the articles to the client
     })
-    .catch(() =>
-      res.status(500).send({ message: "Error fetching saved articles" })
-    );
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({ message: "Invalid ID format" });
+      } else {
+        console.error("Error in getArticles:", err);
+        res.status(500).send({ message: "Error fetching saved articles" });
+      }
+    });
 };
 
 module.exports = {

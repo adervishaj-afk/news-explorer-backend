@@ -1,4 +1,5 @@
 const Article = require("../models/article.js");
+const BadRequestError = require("../utils/errors/BadRequestError"); // Assuming you have a BadRequestError class
 
 // Like (or create) an article
 const likeArticle = (req, res) => {
@@ -32,12 +33,9 @@ const likeArticle = (req, res) => {
       } else {
         // If article exists, check if user has already bookmarked it
         if (article.bookmarkedBy.includes(userId)) {
-          // return res
-          //   .status(409)
-          //   .send({ message: "Article already bookmarked by user." });
-          const newError = new Error()
+          const newError = new Error("Article already bookmarked by user.");
           newError.statusCode = 409;
-          throw (newError)
+          throw newError;
         }
         // If not bookmarked yet, add user to bookmarkedBy
         return Article.findByIdAndUpdate(
@@ -52,7 +50,10 @@ const likeArticle = (req, res) => {
     })
     .catch((err) => {
       if (err.statusCode) {
-        res.status(err.statusCode).send({message: "Testing 409 error for duplicate"})
+        res.status(err.statusCode).send({ message: err.message });
+        return;
+      } else if (err.name === "CastError") {
+        res.status(400).send({ message: "Invalid ID format" });
         return;
       }
       console.error("Error in likeArticle:", err);
@@ -60,6 +61,7 @@ const likeArticle = (req, res) => {
     });
 };
 
+// Delete (or unlike) an article
 const deleteArticle = (req, res) => {
   const articleId = req.params.articleId;
   const userId = req.user._id;
@@ -93,12 +95,16 @@ const deleteArticle = (req, res) => {
 
       return res.status(200).send(updatedArticle); // Otherwise return the updated article
     })
-    .then(() =>
-      res.status(200).send({ message: "Article removed successfully" })
-    )
+    .then(() => {
+      res.status(200).send({ message: "Article removed successfully" });
+    })
     .catch((err) => {
-      console.error("Error in deleteArticle:", err);
-      res.status(500).send({ message: "Error unliking article" });
+      if (err.name === "CastError") {
+        res.status(400).send({ message: "Invalid ID format" });
+      } else {
+        console.error("Error in deleteArticle:", err);
+        res.status(500).send({ message: "Error unliking article" });
+      }
     });
 };
 
