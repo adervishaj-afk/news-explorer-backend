@@ -13,15 +13,13 @@ const createUser = (req, res, next) => {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => {
-      return User.create({
-        name,
-        email,
-        password: hash,
-      });
-    })
+    .then((hash) => User.create({
+      name,
+      email,
+      password: hash,
+    })) // Removed curly braces and `return`
     .then((user) => {
-      const userWithoutPassword = { ...user._doc };
+      const userWithoutPassword = { ...user._doc }; // eslint-disable-line no-underscore-dangle
       delete userWithoutPassword.password; // Do not send password back
       res.status(201).send(userWithoutPassword);
     })

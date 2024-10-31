@@ -1,5 +1,4 @@
-const Article = require("../models/article.js");
-const BadRequestError = require("../utils/errors/BadRequestError"); // Assuming you have a BadRequestError class
+const Article = require("../models/article");
 
 // Get all saved articles for the user (articles the user has liked/bookmarked)
 const getArticles = (req, res) => {
@@ -12,6 +11,7 @@ const getArticles = (req, res) => {
         return res.status(404).send({ message: "No saved articles found" });
       }
       res.send(articles); // Send the articles to the client
+      return null; // Ensure consistent return
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -20,6 +20,7 @@ const getArticles = (req, res) => {
         console.error("Error in getArticles:", err);
         res.status(500).send({ message: "Error fetching saved articles" });
       }
+      return null; // Ensure consistent return
     });
 };
 
