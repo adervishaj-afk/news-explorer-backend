@@ -49,6 +49,9 @@ const likeArticle = (req, res) => {
       if (err.statusCode) {
         return res.status(err.statusCode).send({ message: err.message });
       }
+      if (err.name === "ValidationError") {
+        return res.status(400).send({ message: "Invalid data format" });
+      }
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Invalid ID format" });
       }

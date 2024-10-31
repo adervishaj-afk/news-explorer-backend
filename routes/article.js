@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
-const { validateId } = require("../middlewares/validation");
+const {
+  validateId,
+  validateArticleData,
+} = require("../middlewares/validation");
 const { likeArticle, deleteArticle } = require("../controllers/likeArticle");
 
 const {
@@ -16,6 +19,12 @@ router.get("/saved", auth, getArticles);
 // Delete (Unsave) a bookmarked article
 router.delete("/:articleId/delete", auth, validateId, deleteArticle);
 //  Saved a bookmarked article
-router.post("/:articleId/like", auth, validateId, likeArticle);
+router.post(
+  "/:articleId/like",
+  auth,
+  validateId,
+  validateArticleData,
+  likeArticle
+);
 
 module.exports = router;
