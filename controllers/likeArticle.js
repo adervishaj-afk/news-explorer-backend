@@ -11,6 +11,7 @@ const likeArticle = (req, res) => {
     sourceName,
     url,
   } = req.body;
+  
   const userId = req.user._id;
 
   // First check if the article already exists in the database
