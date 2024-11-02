@@ -5,7 +5,6 @@ https://github.com/adervishaj-afk/news-explorer-backend
 https://github.com/adervishaj-afk/news-explorer-frontend
 
 newsexplore.twilightparadox.com
-www.newsexplore.twilightparadox.com
 api.newsexplore.twilightparadox.com
 
 News Explorer API

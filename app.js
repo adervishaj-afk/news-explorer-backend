@@ -12,12 +12,19 @@ const {
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3001, DATABASE_URL } = process.env;
 const app = express();
 
 // Connect to MongoDB database for the newsexplorer
 mongoose
-  .connect("mongodb://127.0.0.1:27017/newsexplorer")
+  .connect(
+    DATABASE_URL,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+    // "mongodb://127.0.0.1:27017/newsexplorer"
+  )
   .then(() => {
     console.log("Connected to DB"); // eslint-disable-line no-console
   })

@@ -11,7 +11,7 @@ const likeArticle = (req, res) => {
     sourceName,
     url,
   } = req.body;
-  
+
   const userId = req.user._id;
 
   // First check if the article already exists in the database
@@ -82,7 +82,7 @@ const deleteArticle = (req, res) => {
     })
     .then((updatedArticle) => {
       if (!updatedArticle) {
-        return null; // This handles the case where the article was not found after the update
+        return; // Ensures no further code executes if no article is found
       }
 
       // If no users have bookmarked the article, delete it
@@ -98,6 +98,14 @@ const deleteArticle = (req, res) => {
       return res.status(200).send(updatedArticle);
     })
     .catch((err) => {
+      if (err.statusCode) {
+        return res.status(err.statusCode).send({ message: err.message });
+      }
+      if (err.name === "ValidationError") {
+        return res
+          .status(400)
+          .send({ message: "Invalid data format", details: err.message });
+      }
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Invalid ID format" });
       }
