@@ -3,12 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { errors } = require("celebrate");
-const { login, createUser } = require("./controllers/user"); // Adjusted for newsexplorer
 const mainRouter = require("./routes/index");
-const {
-  validateCreateUser,
-  validateLogin,
-} = require("./middlewares/validation");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
@@ -43,10 +38,6 @@ app.get("/crash-test", () => {
     throw new Error("Server will crash now");
   }, 0);
 });
-
-// Authentication routes for signing in and signing up
-app.post("/signin", validateLogin, login);
-app.post("/signup", validateCreateUser, createUser);
 
 // Main routes for articles and users
 app.use("/", mainRouter);
