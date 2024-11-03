@@ -13,15 +13,13 @@ const createUser = (req, res, next) => {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => {
-      return User.create({
-        name,
-        email,
-        password: hash,
-      });
-    })
+    .then((hash) => User.create({
+      name,
+      email,
+      password: hash,
+    })) // Removed curly braces and `return`
     .then((user) => {
-      const userWithoutPassword = { ...user._doc };
+      const userWithoutPassword = { ...user._doc }; // eslint-disable-line no-underscore-dangle
       delete userWithoutPassword.password; // Do not send password back
       res.status(201).send(userWithoutPassword);
     })
@@ -30,6 +28,8 @@ const createUser = (req, res, next) => {
         next(new ConflictError("User with this email already exists"));
       } else if (err.name === "ValidationError") {
         next(new BadRequestError("Invalid user data"));
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
       } else {
         next(err);
       }
@@ -62,7 +62,13 @@ const login = (req, res, next) => {
         res.send({ token });
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Get the current user's information
@@ -74,7 +80,13 @@ const getCurrentUser = (req, res, next) => {
       }
       res.status(200).send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Update user profile (name or avatar)
@@ -95,6 +107,8 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(new BadRequestError("Invalid data for updating profile"));
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID format"));
       } else {
         next(err);
       }

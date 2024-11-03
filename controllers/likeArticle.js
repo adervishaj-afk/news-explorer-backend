@@ -1,68 +1,79 @@
 const Article = require("../models/article");
 
-// Like an article (by articleId generated from title, publishedAt, and sourceName)
+// Like (or create) an article
 const likeArticle = (req, res) => {
-  const articleId = decodeURIComponent(req.params.articleId); // Decoded articleId from request parameters
-  const userId = req.user._id;
-  // console.log("Received articleId:", articleId);
-  // console.log("User ID:", userId);
-  // console.log("Request body:", req.body);
+  const {
+    articleId,
+    title,
+    description,
+    urlToImage,
+    publishedAt,
+    sourceName,
+    url,
+  } = req.body;
 
-  // Find the article by the generated articleId (title-publishedAt-sourceName combination)
+  const userId = req.user._id;
+
+  // First check if the article already exists in the database
   Article.findOne({ articleId })
     .then((article) => {
       if (!article) {
-        // If the article doesn't exist, create a new one
-        const { title, description, urlToImage, publishedAt, sourceName, url } =
-          req.body;
-        console.log("Article not found, creating a new one.");
-
-        // Return the promise from Article.create so it continues the chain
+        // If article does not exist, create a new one
         return Article.create({
-          articleId, // Use the generated articleId as a field, not _id
+          articleId,
           title,
           description,
-          url, // Original article URL
+          url,
           urlToImage,
           publishedAt,
           sourceName,
-          bookmarkedBy: [userId], // Initially bookmark the article by the current user
+          bookmarkedBy: [userId], // Add the current user as the first to bookmark it
         });
-      } else {
-        // If the article exists, update it to add the user to bookmarkedBy
-        return Article.findByIdAndUpdate(
-          article._id,
-          { $addToSet: { bookmarkedBy: userId } }, // Add userId to bookmarkedBy
-          { new: true } // Return the updated document
-        );
       }
+      // If article exists, check if user has already bookmarked it
+      if (article.bookmarkedBy.includes(userId)) {
+        const newError = new Error("Article already bookmarked by user.");
+        newError.statusCode = 409;
+        throw newError;
+      }
+      // If not bookmarked yet, add user to bookmarkedBy
+      return Article.findByIdAndUpdate(
+        article._id,
+        { $addToSet: { bookmarkedBy: userId } }, // Add the user to bookmarkedBy array
+        { new: true }
+      );
     })
-    .then((updatedArticle) => {
-      res.status(200).send(updatedArticle); // Send the updated or newly created article
+    .then((article) => {
+      res.status(200).send(article); // Send back the created/updated article
     })
     .catch((err) => {
-      console.error("Error in likeArticle:", err);
-      res.status(500).send({ message: "Error liking article" });
+      if (err.statusCode) {
+        return res.status(err.statusCode).send({ message: err.message });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(400).send({ message: "Invalid data format" });
+      }
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Invalid ID format" });
+      }
+      console.error("Error in likeArticle:", err); // Consider replacing with a logging library
+      return res.status(500).send({ message: "Error liking article" });
     });
 };
 
+// Delete (or unlike) an article
 const deleteArticle = (req, res) => {
-  const articleId = req.params.articleId;
+  const { articleId } = req.params;
   const userId = req.user._id;
 
-  console.log("Received articleId from params:", articleId);
-  console.log("Received userId from token:", userId);
-
-  // Find the article by the custom articleId (not _id)
-  Article.findOne({_id: articleId })
+  // Find the article by _id (not custom articleId)
+  Article.findOne({ _id: articleId })
     .then((article) => {
-      console.log(article)
       if (!article) {
-        console.log("Article not found for articleId:", articleId);
         return res.status(404).send({ message: "Article not found" });
       }
 
-      // If found, remove the user from the bookmarkedBy array
+      // Remove the user from the bookmarkedBy array
       return Article.findByIdAndUpdate(
         article._id,
         { $pull: { bookmarkedBy: userId } },
@@ -70,21 +81,36 @@ const deleteArticle = (req, res) => {
       );
     })
     .then((updatedArticle) => {
-      if (!updatedArticle) return;
+      if (!updatedArticle) {
+        return; // Ensures no further code executes if no article is found
+      }
 
       // If no users have bookmarked the article, delete it
       if (updatedArticle.bookmarkedBy.length === 0) {
-        return Article.findByIdAndRemove(updatedArticle._id);
+        return Article.findByIdAndRemove(updatedArticle._id).then(() =>
+          res
+            .status(200)
+            .send({ message: "Article unbookmarked and removed successfully" })
+        );
       }
 
-      return res.status(200).send(updatedArticle); // Otherwise return the updated article
+      // If other users have it bookmarked, simply return the updated article
+      return res.status(200).send(updatedArticle);
     })
-    .then(() =>
-      res.status(200).send({ message: "Article removed successfully" })
-    )
     .catch((err) => {
-      console.error("Error in deleteArticle:", err);
-      res.status(500).send({ message: "Error unliking article" });
+      if (err.statusCode) {
+        return res.status(err.statusCode).send({ message: err.message });
+      }
+      if (err.name === "ValidationError") {
+        return res
+          .status(400)
+          .send({ message: "Invalid data format", details: err.message });
+      }
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Invalid ID format" });
+      }
+      console.error("Error in deleteArticle:", err); // Consider replacing with a logging library
+      return res.status(500).send({ message: "Error unliking article" });
     });
 };
 

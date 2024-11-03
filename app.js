@@ -3,23 +3,25 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { errors } = require("celebrate");
-const { login, createUser } = require("./controllers/user"); // Adjusted for newsexplorer
 const mainRouter = require("./routes/index");
-const {
-  validateCreateUser,
-  validateLogin,
-} = require("./middlewares/validation");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3001, DATABASE_URL } = process.env;
 const app = express();
 
 // Connect to MongoDB database for the newsexplorer
 mongoose
-  .connect("mongodb://127.0.0.1:27017/newsexplorer")
+  .connect(
+    DATABASE_URL,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+    // "mongodb://127.0.0.1:27017/newsexplorer"
+  )
   .then(() => {
-    console.log("Connected to DB");
+    console.log("Connected to DB"); // eslint-disable-line no-console
   })
   .catch(console.error);
 
@@ -37,10 +39,6 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-// Authentication routes for signing in and signing up
-app.post("/signin", validateLogin, login);
-app.post("/signup", validateCreateUser, createUser);
-
 // Main routes for articles and users
 app.use("/", mainRouter);
 
@@ -51,5 +49,5 @@ app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`); // eslint-disable-line no-console
 });

@@ -11,14 +11,18 @@ const getArticles = (req, res) => {
         return res.status(404).send({ message: "No saved articles found" });
       }
       res.send(articles); // Send the articles to the client
+      return null; // Ensure consistent return
     })
-    .catch(() => res.status(500).send({ message: "Error fetching saved articles" }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({ message: "Invalid ID format" });
+      } else {
+        console.error("Error in getArticles:", err);
+        res.status(500).send({ message: "Error fetching saved articles" });
+      }
+      return null; // Ensure consistent return
+    });
 };
-
-module.exports = {
-  getArticles,
-};
-
 
 module.exports = {
   getArticles,
