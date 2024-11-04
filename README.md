@@ -1,5 +1,7 @@
 # React + Vite
 
+Author: Adervi
+
 https://github.com/adervishaj-afk/news-explorer-backend
 
 https://github.com/adervishaj-afk/news-explorer-frontend
