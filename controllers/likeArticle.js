@@ -10,6 +10,7 @@ const likeArticle = (req, res) => {
     publishedAt,
     sourceName,
     url,
+    keywords,
   } = req.body;
 
   const userId = req.user._id;
@@ -27,6 +28,7 @@ const likeArticle = (req, res) => {
           urlToImage,
           publishedAt,
           sourceName,
+          keywords,
           bookmarkedBy: [userId], // Add the current user as the first to bookmark it
         });
       }
